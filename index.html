@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>DA-SAR - Daya Saran Perbaikan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ---- DA-SAR design tokens (adapted from the DM-SMS design system) ---- */
+    --primary-50: oklch(97.1% .013 17.38);
+    --primary-100: oklch(93.6% .032 17.717);
+    --primary-400: oklch(70.4% .191 22.216);
+    --primary-500: oklch(63.7% .237 25.331);
+    --primary-600: oklch(57.7% .245 27.325);
+    --primary-700: oklch(50.5% .213 27.518);
+    --gray-50: oklch(98.5% .002 247.839);
+    --gray-100: oklch(96.7% .003 264.542);
+    --gray-200: oklch(92.8% .006 264.531);
+    --gray-300: oklch(87.2% .01 258.338);
+    --gray-400: oklch(70.7% .022 261.325);
+    --gray-500: oklch(55.1% .027 264.364);
+    --gray-600: oklch(44.6% .03 256.802);
+    --gray-700: oklch(37.3% .034 259.733);
+    --gray-900: oklch(21% .034 264.665);
+    --success-50: oklch(97.9% .021 166.113);
+    --success-600: oklch(59.6% .145 163.225);
+    --success-700: oklch(50.8% .118 165.612);
+    --warning-50: oklch(98.7% .022 95.277);
+    --warning-600: oklch(66.6% .179 58.318);
+    --warning-700: oklch(55.5% .163 48.998);
+    --info-50: oklch(97% .014 254.604);
+    --info-600: oklch(54.6% .245 262.881);
+    --info-700: oklch(48.8% .243 264.376);
+
+    --surface-page: var(--gray-50);
+    --surface-card: #fff;
+    --border-default: var(--gray-200);
+    --text-heading: var(--gray-900);
+    --text-body: var(--gray-700);
+    --text-muted: var(--gray-500);
+    --focus-ring: var(--primary-100);
+
+    --radius-md: .375rem;
+    --radius-lg: .5rem;
+    --radius-xl: .75rem;
+    --radius-full: 999px;
+    --ring-card: inset 0 0 0 1px rgba(0,0,0,.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px -1px rgba(0,0,0,.1);
+
+    --font-sans: 'Inter', 'Segoe UI', Arial, sans-serif;
+
+    /* legacy aliases - every existing var(--x) usage below keeps working unchanged */
+    --primary: var(--primary-600);
+    --dark: var(--gray-900);
+    --bg: var(--surface-page);
+    --ok: var(--success-600);
+    --warn: var(--warning-600);
+  }
+  *{box-sizing:border-box;font-family:var(--font-sans);}
+  body{margin:0;background:var(--bg);color:var(--text-body);}
+  .shell{display:flex;min-height:100vh;}
+  .sidebar{width:220px;flex-shrink:0;background:var(--surface-card);border-right:1px solid var(--border-default);display:flex;flex-direction:column;padding:20px 16px;gap:20px;}
+  .sidebar .brand{display:flex;align-items:center;gap:10px;}
+  .sidebar .brand-badge{width:36px;height:36px;border-radius:var(--radius-lg);background:var(--primary-600);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .sidebar h1{font-size:17px;font-weight:700;letter-spacing:-.01em;margin:0;color:var(--text-heading);white-space:nowrap;}
+  .sidebar h1 .dot{color:var(--primary-600);}
+  .sidebar h1 .subtitle{display:block;font-size:10px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);margin-top:2px;white-space:nowrap;}
+  .sidebar-role{display:flex;flex-direction:column;gap:8px;}
+  .sidebar-role select{width:100%;max-width:none;}
+  #tabs{display:flex;flex-direction:column;gap:2px;}
+  #tabs button{display:flex;align-items:center;gap:10px;border:none;background:none;padding:9px 12px;border-radius:var(--radius-lg);cursor:pointer;font-size:13px;font-weight:500;color:var(--gray-600);text-align:left;transition:background .15s,color .15s;}
+  #tabs button svg{flex-shrink:0;}
+  #tabs button:hover{background:var(--gray-50);}
+  #tabs button.active{background:var(--primary-50);color:var(--primary-700);font-weight:600;}
+  .shell-main{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--surface-page);}
+  .topbar{height:56px;background:var(--surface-card);border-bottom:1px solid var(--border-default);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;gap:10px;}
+  .topbar-title{font-size:15px;font-weight:600;color:var(--text-heading);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .topbar-context{font-size:12px;color:var(--text-muted);white-space:nowrap;}
+  main{padding:24px;max-width:1100px;margin:0 auto;width:100%;}
+  @media (max-width:900px){
+    .shell{flex-direction:column;}
+    .sidebar{width:100%;flex-direction:row;flex-wrap:wrap;align-items:center;padding:12px 16px;gap:12px;border-right:none;border-bottom:1px solid var(--border-default);}
+    .sidebar .brand{flex:1;}
+    .sidebar-role{flex-direction:row;flex-wrap:wrap;gap:8px;}
+    #tabs{flex-direction:row;flex-wrap:wrap;width:100%;order:3;border-top:1px solid var(--border-default);padding-top:10px;}
+    main{padding:16px;}
+  }
+  .card{background:var(--surface-card);border-radius:var(--radius-xl);padding:20px;margin-bottom:16px;box-shadow:var(--ring-card),var(--shadow-sm);}
+  .card.accordion{padding:0;}
+  .accordion-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 20px;cursor:pointer;user-select:none;}
+  .accordion-head h3{margin:0;}
+  .accordion-chevron{color:var(--primary-600);font-size:11px;transition:transform .15s;flex-shrink:0;}
+  .card.accordion[data-open="false"] .accordion-chevron{transform:rotate(-90deg);}
+  .accordion-body{padding:0 20px 20px;}
+  .card.accordion[data-open="false"] .accordion-body{display:none;}
+  h3{color:var(--text-heading);font-size:16px;letter-spacing:-.01em;}
+  h4{color:var(--text-heading);font-size:14px;}
+  label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px;color:var(--text-body);}
+  input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--gray-300);border-radius:var(--radius-md);font-size:14px;color:var(--text-heading);background:var(--surface-card);transition:border-color .15s,box-shadow .15s;}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary-500);box-shadow:0 0 0 3px var(--focus-ring);}
+  .req::after{content:" *";color:var(--primary-600);}
+  .row{display:flex;gap:12px;flex-wrap:wrap;}
+  .row>div{flex:1;min-width:160px;}
+  button.primary{background:var(--primary-600);color:#fff;border:none;padding:10px 18px;border-radius:var(--radius-lg);cursor:pointer;font-size:14px;font-weight:600;margin-top:14px;transition:background .15s;}
+  button.primary:hover{background:var(--primary-700);}
+  button.primary:disabled{background:var(--gray-300);cursor:not-allowed;}
+  button.secondary{background:var(--gray-100);color:var(--text-body);border:none;padding:8px 14px;border-radius:var(--radius-lg);cursor:pointer;font-size:14px;font-weight:500;margin-top:8px;transition:background .15s;}
+  button.secondary:hover{background:var(--gray-200);}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px;}
+  th,td{border-bottom:1px solid var(--border-default);padding:9px 8px;text-align:left;}
+  th{background:var(--gray-50);color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+  tbody tr:hover{background:var(--gray-50);}
+  .badge{padding:4px 10px;border-radius:var(--radius-full);font-size:12px;font-weight:600;}
+  .badge.wait{background:var(--warning-50);color:var(--warning-700);}
+  .badge.ready{background:var(--info-50);color:var(--info-700);}
+  .badge.sent{background:var(--success-50);color:var(--success-700);}
+  .badge.followup{background:var(--gray-100);color:var(--gray-700);}
+  .badge.overdue{background:var(--primary-50);color:var(--primary-700);}
+  .item-block{background:var(--surface-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);padding:14px;margin-top:10px;position:relative;}
+  .items-table td,.items-table th{vertical-align:middle;}
+  .items-table td input{margin:0;}
+  .items-table td:nth-child(2) input{width:70px;}
+  #ban-merk-extra input{width:100%;}
+  .row-remove{background:none;border:none;color:var(--primary-600);font-size:18px;line-height:1;cursor:pointer;padding:4px 8px;margin:0;}
+  .kpi{display:flex;gap:16px;flex-wrap:wrap;}
+  .kpi .box{flex:1;min-width:150px;background:var(--surface-card);border-radius:var(--radius-xl);padding:16px;text-align:center;box-shadow:var(--ring-card),var(--shadow-sm);}
+  .kpi .box .num{font-size:26px;font-weight:700;color:var(--primary-600);}
+  .kpi .box.warning .num{color:var(--warning-600);}
+  .kpi .box.success .num{color:var(--success-600);}
+  .kpi .box.info .num{color:var(--info-600);}
+  .kpi .box .lbl{font-size:12px;color:var(--text-muted);}
+  .note{font-size:12px;color:var(--text-muted);margin-top:6px;}
+  .split-panel{display:flex;background:var(--surface-card);border-radius:var(--radius-xl);box-shadow:var(--ring-card),var(--shadow-sm);overflow:hidden;min-height:65vh;}
+  .split-queue{width:300px;flex-shrink:0;border-right:1px solid var(--border-default);overflow-y:auto;padding:12px;}
+  .split-detail{flex:1;overflow-y:auto;padding:20px;min-width:0;}
+  .queue-item{background:var(--surface-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);padding:12px;margin-bottom:8px;cursor:pointer;transition:box-shadow .15s;}
+  .queue-item:hover{box-shadow:var(--shadow-sm);}
+  .queue-item.active{box-shadow:0 0 0 2px var(--primary-500);}
+  @media (max-width:900px){
+    .split-panel{flex-direction:column;min-height:0;}
+    .split-queue{width:100%;border-right:none;border-bottom:1px solid var(--border-default);max-height:240px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-badge">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a4 4 0 00-5.4 4.6L4 16.2V20h3.8l5.3-5.3a4 4 0 004.6-5.4l-2.6 2.6-2-2 2.6-2.6z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      </div>
+      <h1>DA<span class="dot">&middot;</span>SAR<span class="subtitle">Daya Saran Perbaikan</span></h1>
+    </div>
+    <div class="sidebar-role">
+      <select id="roleSwitch">
+        <option value="teknisi">Login sebagai: Teknisi</option>
+        <option value="foreman">Login sebagai: Foreman</option>
+        <option value="sa">Login sebagai: Service Advisor</option>
+        <option value="kabengkel">Login sebagai: Kepala Bengkel</option>
+      </select>
+      <select id="saSwitch" style="display:none;width:auto;">
+        <option value="">-- Pilih Nama SA --</option>
+      </select>
+      <select id="teknisiSwitch" style="display:none;width:auto;">
+        <option value="">-- Pilih Nama Teknisi --</option>
+      </select>
+      <select id="foremanSwitch" style="display:none;width:auto;">
+        <option value="">-- Pilih Nama Foreman --</option>
+      </select>
+    </div>
+    <nav id="tabs"></nav>
+  </aside>
+  <div class="shell-main">
+    <div class="topbar">
+      <span id="pageTitle" class="topbar-title"></span>
+      <span id="topbarContext" class="topbar-context"></span>
+    </div>
+    <main id="app"></main>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   GANTI dengan URL Web App hasil deploy Google Apps Script:
+   contoh: https://script.google.com/macros/s/XXXXXXX/exec
+   ============================================================ */
+const API_URL = "https://script.google.com/macros/s/AKfycbyWb1fyKjQqjigkPWeCqYWGUePO_1mobVKYK8mnNRAO5Er1zXTXk-3x3GXVuw1TB6nPvw/exec";
+
+let currentRole = "teknisi";
+let currentDetailId = null;
+let currentSA = "";
+let currentTeknisi = "";
+let currentForeman = "";
+let currentView = null;
+
+const ICON_STROKE = 'fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"';
+const ICONS = {
+  plusCircle: `<svg width="16" height="16" viewBox="0 0 24 24" ${ICON_STROKE}><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`,
+  clock: `<svg width="16" height="16" viewBox="0 0 24 24" ${ICON_STROKE}><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>`,
+  clipboardList: `<svg width="16" height="16" viewBox="0 0 24 24" ${ICON_STROKE}><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/><line x1="9" y1="18" x2="13" y2="18"/></svg>`,
+  checkCircle: `<svg width="16" height="16" viewBox="0 0 24 24" ${ICON_STROKE}><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5.5"/></svg>`,
+  documentText: `<svg width="16" height="16" viewBox="0 0 24 24" ${ICON_STROKE}><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><line x1="9.5" y1="12" x2="14.5" y2="12"/><line x1="9.5" y1="15.5" x2="14.5" y2="15.5"/></svg>`,
+  buildingOffice: `<svg width="16" height="16" viewBox="0 0 24 24" ${ICON_STROKE}><rect x="5" y="3" width="14" height="18" rx="1"/><line x1="9" y1="7" x2="9" y2="7.01"/><line x1="15" y1="7" x2="15" y2="7.01"/><line x1="9" y1="11" x2="9" y2="11.01"/><line x1="15" y1="11" x2="15" y2="11.01"/><line x1="9" y1="15" x2="9" y2="15.01"/><line x1="15" y1="15" x2="15" y2="15.01"/><rect x="10" y="17" width="4" height="4"/></svg>`
+};
+
+const TABS = {
+  teknisi:   [["input","Input Saran Baru","plusCircle"],["riwayat","Riwayat Saya","clock"]],
+  foreman:   [["antrian","Antrian Perlu Dilengkapi","clipboardList"],["riwayatForeman","Riwayat","clock"]],
+  sa:        [["konfirmasi","Perlu Dikonfirmasi","checkCircle"],["followup","Follow Up","clock"],["laporan","Kirim Report Customer","documentText"]],
+  kabengkel: [["dashboard","Dashboard","buildingOffice"],["semua","Semua Kunjungan","clipboardList"]],
+};
+const VIEW_TITLES = {
+  input:"Input Saran Baru", riwayat:"Riwayat Saya", antrian:"Antrian Perlu Dilengkapi", riwayatForeman:"Riwayat",
+  konfirmasi:"Perlu Dikonfirmasi", followup:"Follow Up", laporan:"Kirim Report Customer",
+  dashboard:"Dashboard", semua:"Semua Kunjungan"
+};
+const ROLE_LABELS = { teknisi:"Teknisi", foreman:"Foreman", sa:"Service Advisor", kabengkel:"Kepala Bengkel" };
+
+document.getElementById('roleSwitch').addEventListener('change', e=>{
+  currentRole = e.target.value;
+  currentSA = "";
+  currentTeknisi = "";
+  currentForeman = "";
+  updateIdentitySwitches();
+  renderTabs();
+});
+document.getElementById('saSwitch').addEventListener('change', e=>{
+  currentSA = e.target.value;
+  render(currentView || TABS[currentRole][0][0]);
+});
+document.getElementById('teknisiSwitch').addEventListener('change', e=>{
+  currentTeknisi = e.target.value;
+  render(currentView || TABS[currentRole][0][0]);
+});
+document.getElementById('foremanSwitch').addEventListener('change', e=>{
+  currentForeman = e.target.value;
+  render(currentView || TABS[currentRole][0][0]);
+});
+async function updateIdentitySwitches(){
+  const saSwitch = document.getElementById('saSwitch');
+  const teknisiSwitch = document.getElementById('teknisiSwitch');
+  const foremanSwitch = document.getElementById('foremanSwitch');
+  saSwitch.style.display = currentRole === 'sa' ? '' : 'none';
+  teknisiSwitch.style.display = currentRole === 'teknisi' ? '' : 'none';
+  foremanSwitch.style.display = currentRole === 'foreman' ? '' : 'none';
+  if(currentRole === 'sa'){
+    const md = await loadMasterData();
+    saSwitch.innerHTML = optionList(md.Service_Advisor);
+    saSwitch.value = currentSA;
+  } else if(currentRole === 'teknisi'){
+    const md = await loadMasterData();
+    teknisiSwitch.innerHTML = optionList(md.Teknisi);
+    teknisiSwitch.value = currentTeknisi;
+  } else if(currentRole === 'foreman'){
+    const md = await loadMasterData();
+    foremanSwitch.innerHTML = optionList(md.Foreman);
+    foremanSwitch.value = currentForeman;
+  }
+}
+
+function renderTabs(){
+  const nav = document.getElementById('tabs');
+  nav.innerHTML = '';
+  TABS[currentRole].forEach(([key,label,icon],i)=>{
+    const b = document.createElement('button');
+    b.innerHTML = (ICONS[icon]||'') + '<span>' + label + '</span>';
+    if(i===0) b.classList.add('active');
+    b.onclick = ()=>{ [...nav.children].forEach(c=>c.classList.remove('active')); b.classList.add('active'); render(key); };
+    nav.appendChild(b);
+  });
+  render(TABS[currentRole][0][0]);
+}
+
+async function api(action, method='GET', body=null){
+  if(API_URL.includes('PASTE_URL')){
+    alert('Prototype mode: API_URL belum di-set. Ini hanya tampilan UI. Set API_URL ke Web App Apps Script untuk fungsi penuh.');
+    return { demo:true };
+  }
+  if(method==='GET'){
+    const url = API_URL + '?action=' + action + (body? '&'+new URLSearchParams(body).toString():'');
+    return fetch(url).then(r=>r.json());
+  }
+  return fetch(API_URL, { method:'POST', body: JSON.stringify({action, ...body}) }).then(r=>r.json());
+}
+
+function render(view){
+  currentView = view;
+  document.getElementById('pageTitle').textContent = VIEW_TITLES[view] || '';
+  document.getElementById('topbarContext').textContent =
+    (currentRole==='sa' && currentSA) ? ('SA: '+currentSA) :
+    (currentRole==='teknisi' && currentTeknisi) ? ('Teknisi: '+currentTeknisi) :
+    (currentRole==='foreman' && currentForeman) ? ('Foreman: '+currentForeman) :
+    ('Login sebagai: '+(ROLE_LABELS[currentRole]||''));
+  const app = document.getElementById('app');
+  if(view==='input') return renderInputTeknisi(app);
+  if(view==='riwayat') return renderRiwayatTeknisi(app);
+  if(view==='antrian') return renderAntrianForeman(app);
+  if(view==='riwayatForeman') return renderRiwayatForeman(app);
+  if(view==='konfirmasi') return renderKonfirmasiSA(app);
+  if(view==='followup') return renderFollowUp(app);
+  if(view==='laporan') return renderLaporan(app);
+  if(view==='dashboard') return renderDashboard(app);
+  if(view==='semua') return renderSemua(app);
+}
+function requireSA(app){
+  if(currentSA) return true;
+  app.innerHTML = '<div class="card"><p class="note">Pilih nama SA Anda dulu di sidebar.</p></div>';
+  return false;
+}
+function requireTeknisi(app){
+  if(currentTeknisi) return true;
+  app.innerHTML = '<div class="card"><p class="note">Pilih nama Teknisi Anda dulu di sidebar.</p></div>';
+  return false;
+}
+function requireForeman(app){
+  if(currentForeman) return true;
+  app.innerHTML = '<div class="card"><p class="note">Pilih nama Foreman Anda dulu di sidebar.</p></div>';
+  return false;
+}
+function statusBadgeClass(status){
+  if(status==='Report Terkirim') return 'sent';
+  if(status==='Follow Up') return 'followup';
+  if(status==='Menunggu Foreman' || status==='Menunggu Partman') return 'wait';
+  return '';
+}
+function sortRows(rows, key, dir){
+  const isDateKey = key === 'Tanggal_Masuk' || key === 'Timestamp';
+  return [...rows].sort((a,b)=>{
+    let av = a[key] || '', bv = b[key] || '';
+    if(isDateKey){ av = new Date(av).getTime() || 0; bv = new Date(bv).getTime() || 0; }
+    else { av = String(av).toLowerCase(); bv = String(bv).toLowerCase(); }
+    if(av < bv) return dir === 'asc' ? -1 : 1;
+    if(av > bv) return dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+}
+
+/* ---------- Tabel generik: sortable + filterable per kolom ---------- */
+const DT_REGISTRY = {};
+function dtInit(containerId, rows, columns, sortKey, emptyMsg){
+  DT_REGISTRY[containerId] = { rows, columns, filters: {}, sortKey, sortDir: 'desc', emptyMsg: emptyMsg || 'Tidak ada data.' };
+  dtRender(containerId);
+}
+function dtSort(containerId, key){
+  const st = DT_REGISTRY[containerId];
+  if(!st) return;
+  if(st.sortKey === key) st.sortDir = st.sortDir === 'asc' ? 'desc' : 'asc';
+  else { st.sortKey = key; st.sortDir = 'asc'; }
+  dtRender(containerId);
+}
+function dtFilter(containerId, key, value){
+  const st = DT_REGISTRY[containerId];
+  if(!st) return;
+  st.filters[key] = value;
+  dtRender(containerId);
+}
+function dtRender(containerId){
+  const st = DT_REGISTRY[containerId];
+  const container = document.getElementById(containerId);
+  if(!st || !container) return;
+  const prevFocused = document.activeElement;
+  const prevFocusedId = (prevFocused && prevFocused.id && prevFocused.id.indexOf(containerId+'-f-')===0) ? prevFocused.id : null;
+  const prevCaret = (prevFocusedId && typeof prevFocused.selectionStart === 'number') ? prevFocused.selectionStart : null;
+
+  let filtered = st.rows.filter(r => st.columns.every(col => {
+    if(!col.filterable) return true;
+    const fval = st.filters[col.key];
+    if(!fval) return true;
+    const rval = String(col.filterValue ? col.filterValue(r) : (r[col.key]||''));
+    return col.filterType === 'select' ? rval === fval : rval.toLowerCase().includes(fval.toLowerCase());
+  }));
+  filtered = sortRows(filtered, st.sortKey, st.sortDir);
+  const arrow = key => st.sortKey===key ? (st.sortDir==='asc' ? ' ▲' : ' ▼') : '';
+
+  const headCells = st.columns.map(col => col.sortable===false
+    ? `<th>${col.label}</th>`
+    : `<th style="cursor:pointer;" onclick="dtSort('${containerId}','${col.key}')">${col.label}${arrow(col.key)}</th>`
+  ).join('');
+  const filterCells = st.columns.map(col => {
+    if(!col.filterable) return '<th></th>';
+    const fid = `${containerId}-f-${col.key}`;
+    if(col.filterType === 'select'){
+      const opts = [...new Set(st.rows.map(r=>(col.filterValue?col.filterValue(r):r[col.key])||'').filter(Boolean))].sort();
+      return `<th><select id="${fid}" style="padding:4px 6px;font-size:12px;" onchange="dtFilter('${containerId}','${col.key}',this.value)"><option value="">Semua</option>${opts.map(o=>`<option value="${escapeHtml(o)}" ${st.filters[col.key]===o?'selected':''}>${escapeHtml(o)}</option>`).join('')}</select></th>`;
+    }
+    return `<th><input id="${fid}" style="padding:4px 6px;font-size:12px;" placeholder="Cari..." value="${escapeHtml(st.filters[col.key]||'')}" oninput="dtFilter('${containerId}','${col.key}',this.value)"></th>`;
+  }).join('');
+  const bodyHtml = filtered.length ? filtered.map(r=>`<tr>${st.columns.map(col=>`<td>${col.render?col.render(r):escapeHtml(r[col.key]||'-')}</td>`).join('')}</tr>`).join('')
+    : `<tr><td colspan="${st.columns.length}"><p class="note">${st.emptyMsg}</p></td></tr>`;
+
+  container.innerHTML = `
+    <div style="overflow-x:auto;">
+    <table>
+      <thead><tr>${headCells}</tr><tr>${filterCells}</tr></thead>
+      <tbody>${bodyHtml}</tbody>
+    </table>
+    </div>
+    <p class="note">${filtered.length} dari ${st.rows.length} data.</p>
+  `;
+  if(prevFocusedId){
+    const el = document.getElementById(prevFocusedId);
+    if(el){ el.focus(); if(prevCaret!==null && el.setSelectionRange) el.setSelectionRange(prevCaret, prevCaret); }
+  }
+}
+
+/* ---------- TEKNISI: input saran ---------- */
+let itemCount = 0;
+let masterData = null;
+async function loadMasterData(){
+  if(masterData) return masterData;
+  const md = await api('masterData');
+  masterData = (md && !md.error) ? md : { Tipe_Mobil:[], Tipe_Service:[], Service_Advisor:[], Teknisi:[], SSC:[], Alasan_SSC:[], Foreman:[] };
+  return masterData;
+}
+function normalizeNoPolisi(el){
+  el.value = el.value.toUpperCase().split(' ').join('');
+}
+function toggleAccordion(headEl){
+  const card = headEl.closest('.accordion');
+  card.dataset.open = card.dataset.open === 'false' ? 'true' : 'false';
+}
+function formatRibuan(el){
+  const digits = el.value.replace(/\D/g,'');
+  el.value = digits ? Number(digits).toLocaleString('id-ID') : '';
+}
+function toRibuan(n){
+  n = Number(n) || 0;
+  return n ? n.toLocaleString('id-ID') : '';
+}
+function parseRibuan(str){
+  const digits = (str||'').toString().replace(/\D/g,'');
+  return digits ? Number(digits) : 0;
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function optionList(values){
+  return '<option value="">-- Pilih --</option>' + (values||[]).map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
+}
+// Sisipkan `value` ke daftar kalau belum ada - supaya data lama yang nilainya sudah
+// tidak ada lagi di MasterData tetap terlihat & tidak diam-diam jadi kosong saat diedit.
+function ensureOptionPresent(values, value){
+  values = values || [];
+  return (value && !values.includes(value)) ? values.concat([value]) : values;
+}
+// Set value sebuah <select>, dan kalau value itu bukan salah satu <option> yang ada
+// (mis. MasterData sudah diubah sejak baris ini dibuat), sisipkan dulu sebagai
+// option baru supaya nilai lama tetap terlihat & tidak diam-diam jadi kosong.
+function setSelectValuePreserving(selectEl, value){
+  if(!value){ selectEl.value = ''; return; }
+  if(![...selectEl.options].some(o=>o.value===value)){
+    const opt = document.createElement('option');
+    opt.value = value; opt.textContent = value;
+    selectEl.appendChild(opt);
+  }
+  selectEl.value = value;
+}
+function optionListWithOther(values){
+  return optionList(values) + '<option value="Others">Others</option>';
+}
+function toggleOther(selectEl){
+  const otherInput = selectEl.nextElementSibling;
+  otherInput.style.display = selectEl.value === 'Others' ? '' : 'none';
+  if(selectEl.value !== 'Others') otherInput.value = '';
+}
+function readDropdownWithOther(selectEl){
+  return selectEl.value === 'Others' ? selectEl.nextElementSibling.value : selectEl.value;
+}
+function checklistRow(key, label){
+  const hargaCell = key === 'ban' ? '<td></td>' : `<td><input id="chk-harga-${key}" type="text" inputmode="numeric" oninput="formatRibuan(this)" style="display:none"></td>`;
+  return `
+  <tr>
+    <td>${label}</td>
+    <td><select id="chk-status-${key}" onchange="toggleHarga('${key}')"><option value="">-- Pilih --</option><option value="OK">OK</option><option value="NOK">NOK</option></select></td>
+    <td><input id="chk-ket-${key}"></td>
+    ${hargaCell}
+  </tr>`;
+}
+function toggleHarga(key){
+  const status = document.getElementById('chk-status-'+key).value;
+  const hargaEl = document.getElementById('chk-harga-'+key);
+  if(hargaEl){
+    hargaEl.style.display = status === 'NOK' ? '' : 'none';
+    if(status !== 'NOK') hargaEl.value = '';
+  }
+  if(key === 'ban'){
+    const extra = document.getElementById('ban-merk-extra');
+    extra.style.display = status === 'NOK' ? '' : 'none';
+    if(status !== 'NOK'){
+      ['ban-merk1','ban-harga1','ban-merk2','ban-harga2'].forEach(id => document.getElementById(id).value = '');
+    }
+  }
+}
+function readChecklist(key){
+  const hargaEl = document.getElementById('chk-harga-'+key);
+  return {
+    status: document.getElementById('chk-status-'+key).value,
+    keterangan: document.getElementById('chk-ket-'+key).value,
+    harga: hargaEl ? parseRibuan(hargaEl.value) : 0
+  };
+}
+function toggleHybrid(){
+  const isYes = document.getElementById('mobilHybrid').value === 'Yes';
+  document.getElementById('hybrid-sub').style.display = isYes ? '' : 'none';
+  if(!isYes){
+    document.getElementById('sbe50k100k').value = 'No';
+    document.getElementById('mobil2to5Tahun').value = 'No';
+  }
+  toggleHHC();
+}
+function toggleHHC(){
+  const hybridYes = document.getElementById('mobilHybrid').value === 'Yes';
+  const sbeYes = document.getElementById('sbe50k100k').value === 'Yes';
+  const mobil2to5Yes = document.getElementById('mobil2to5Tahun').value === 'Yes';
+  const show = hybridYes && (sbeYes || mobil2to5Yes);
+  document.getElementById('hhc-block').style.display = show ? '' : 'none';
+  if(!show){
+    document.getElementById('hhcStatus').value = 'No';
+    document.getElementById('hhcHasil').value = '';
+  }
+}
+function dataUnitCardHtml(md, today){
+  return `
+  <div class="card accordion" data-open="true">
+    <div class="accordion-head" onclick="toggleAccordion(this)"><h3>Data Unit / Customer</h3><span class="accordion-chevron">&#9662;</span></div>
+    <div class="accordion-body">
+    <div class="row">
+      <div><label class="req">No. Polisi</label><input id="noPolisi" placeholder="B1234ABC" oninput="normalizeNoPolisi(this)"></div>
+      <div><label class="req">Nama Customer</label><input id="namaCustomer"></div>
+      <div><label>No. HP Customer</label><input id="noHp"></div>
+    </div>
+    <div class="row">
+      <div><label class="req">Tipe Mobil</label><select id="tipeMobil">${optionList(md.Tipe_Mobil)}</select></div>
+      <div><label class="req">Tipe Service</label><select id="tipeService">${optionList(md.Tipe_Service)}</select></div>
+      <div><label class="req">Tanggal Service</label><input id="tanggalService" type="date" value="${today}"></div>
+    </div>
+    <div class="row">
+      <div><label class="req">Service Advisor</label><select id="sa">${optionList(md.Service_Advisor)}</select></div>
+      <div><label class="req">Teknisi</label><select id="teknisi">${optionList(md.Teknisi)}</select></div>
+    </div>
+    </div>
+  </div>`;
+}
+function prosesServiceCardHtml(){
+  return `
+  <div class="card accordion" data-open="false">
+    <div class="accordion-head" onclick="toggleAccordion(this)"><h3>Proses Service</h3><span class="accordion-chevron">&#9662;</span></div>
+    <div class="accordion-body">
+    <label>Pekerjaan</label>
+    <textarea id="pekerjaan" rows="3" placeholder="Input sesuai jasa yang di buat di WO"></textarea>
+    <label>Request Customer</label>
+    <textarea id="requestCustomer" rows="3" placeholder="Input sesuai Request/Keluhan Cust. dan sertakan solusi & apa yang dilakukan"></textarea>
+    <div style="overflow-x:auto;">
+      <table class="items-table checklist-table">
+        <thead>
+          <tr><th>Komponen</th><th>Status</th><th>Keterangan</th><th>Harga</th></tr>
+        </thead>
+        <tbody>
+          ${checklistRow('aki','Aki')}
+          ${checklistRow('ban','Ban')}
+        </tbody>
+        <tbody id="ban-merk-extra" style="display:none">
+          <tr>
+            <td></td>
+            <td colspan="3">
+              <div class="row">
+                <div><label>Merk 1</label><input id="ban-merk1"></div>
+                <div><label>Harga 1</label><input id="ban-harga1" type="text" inputmode="numeric" oninput="formatRibuan(this)"></div>
+              </div>
+              <div class="row">
+                <div><label>Merk 2</label><input id="ban-merk2"></div>
+                <div><label>Harga 2</label><input id="ban-harga2" type="text" inputmode="numeric" oninput="formatRibuan(this)"></div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tbody>
+          ${checklistRow('kampasRem','Kampas Rem')}
+          ${checklistRow('wiper','Wiper')}
+          ${checklistRow('lampu','Lampu')}
+        </tbody>
+      </table>
+    </div>
+    </div>
+  </div>`;
+}
+function hybridHealthCheckCardHtml(){
+  return `
+  <div class="card accordion" data-open="false">
+    <div class="accordion-head" onclick="toggleAccordion(this)"><h3>Hybrid Health Check</h3><span class="accordion-chevron">&#9662;</span></div>
+    <div class="accordion-body">
+    <div class="row">
+      <div><label>Mobil Hybrid</label>
+        <select id="mobilHybrid" onchange="toggleHybrid()"><option value="No">No</option><option value="Yes">Yes</option></select>
+      </div>
+    </div>
+    <div id="hybrid-sub" style="display:none">
+      <p class="note">*muncul jika memilih Yes</p>
+      <div class="row">
+        <div><label>SBE 50K - 100K</label>
+          <select id="sbe50k100k" onchange="toggleHHC()"><option value="No">No</option><option value="Yes">Yes</option></select>
+        </div>
+        <div><label>Mobil diatas &gt;2 Tahun dan &lt;5 Tahun</label>
+          <select id="mobil2to5Tahun" onchange="toggleHHC()"><option value="No">No</option><option value="Yes">Yes</option></select>
+        </div>
+      </div>
+      <div id="hhc-block" style="display:none">
+        <p class="note">*muncul jika salah satu dari kriteria setelah memilih Mobil Hybrid memilih Yes</p>
+        <div class="row">
+          <div><label>HHC</label>
+            <select id="hhcStatus"><option value="No">No</option><option value="Yes">Yes</option></select>
+          </div>
+          <div><label>Hasil</label>
+            <select id="hhcHasil"><option value="">-- Pilih --</option><option value="Good">Good</option><option value="Not Good">Not Good</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>`;
+}
+function fillHybridHealthCheckFromKunjungan(kj){
+  document.getElementById('mobilHybrid').value = kj.Mobil_Hybrid || 'No';
+  document.getElementById('sbe50k100k').value = kj.SBE_50K_100K || 'No';
+  document.getElementById('mobil2to5Tahun').value = kj.Mobil_2_5_Tahun || 'No';
+  document.getElementById('hhcStatus').value = kj.HHC || 'No';
+  document.getElementById('hhcHasil').value = kj.HHC_Hasil || '';
+  toggleHybrid();
+}
+function ujiEmisiCardHtml(){
+  return `
+  <div class="card accordion" data-open="false">
+    <div class="accordion-head" onclick="toggleAccordion(this)"><h3>Uji Emisi</h3><span class="accordion-chevron">&#9662;</span></div>
+    <div class="accordion-body">
+    <div class="row">
+      <div><label>Apakah Status Uji Emisi Unit Ini ?</label>
+        <select id="ujiEmisiStatus">
+          <option value="">-- Pilih --</option>
+          <option value="Tidak Lulus/Belum Uji Emisi/Kadaluarsa">Tidak Lulus/Belum Uji Emisi/Kadaluarsa</option>
+          <option value="Aktif">Aktif</option>
+        </select>
+        <p class="note">Cek di <a href="https://ujiemisi.jakarta.go.id/" target="_blank" rel="noopener">ujiemisi.jakarta.go.id</a></p>
+      </div>
+      <div><label>Foto</label>
+        <input id="ujiEmisiFoto" type="file" accept="image/*">
+        <div id="ujiEmisiFotoExisting" class="note"></div>
+      </div>
+    </div>
+    </div>
+  </div>`;
+}
+function fillUjiEmisiFromKunjungan(kj){
+  setSelectValuePreserving(document.getElementById('ujiEmisiStatus'), kj.UjiEmisi_Status);
+  const existing = document.getElementById('ujiEmisiFotoExisting');
+  existing.innerHTML = kj.UjiEmisi_Foto_URL ? `Foto saat ini: <a href="${kj.UjiEmisi_Foto_URL}" target="_blank">lihat</a> (upload baru untuk mengganti)` : '';
+}
+function toDateInputValue(isoString){
+  if(!isoString) return '';
+  const d = new Date(isoString);
+  if(isNaN(d)) return '';
+  const local = new Date(d.getTime() - d.getTimezoneOffset()*60000);
+  return local.toISOString().slice(0,10);
+}
+function fillProsesServiceFromKunjungan(kj){
+  document.getElementById('pekerjaan').value = kj.Pekerjaan || '';
+  document.getElementById('requestCustomer').value = kj.Request_Customer || '';
+  ['aki','ban','kampasRem','wiper','lampu'].forEach(key=>{
+    const prefix = key === 'kampasRem' ? 'KampasRem' : key.charAt(0).toUpperCase()+key.slice(1);
+    document.getElementById('chk-status-'+key).value = kj[prefix+'_Status'] || 'OK';
+    document.getElementById('chk-ket-'+key).value = kj[prefix+'_Keterangan'] || '';
+    const hargaEl = document.getElementById('chk-harga-'+key);
+    if(hargaEl) hargaEl.value = toRibuan(kj[prefix+'_Harga']);
+  });
+  document.getElementById('ban-merk1').value = kj.Ban_Merk1 || '';
+  document.getElementById('ban-harga1').value = toRibuan(kj.Ban_Harga1);
+  document.getElementById('ban-merk2').value = kj.Ban_Merk2 || '';
+  document.getElementById('ban-harga2').value = toRibuan(kj.Ban_Harga2);
+  ['aki','ban','kampasRem','wiper','lampu'].forEach(key=>toggleHarga(key));
+}
+async function renderInputTeknisi(app){
+  itemCount = 0;
+  jasaCount = 0;
+  app.innerHTML = `<div class="card"><p class="note">Memuat data...</p></div>`;
+  const md = await loadMasterData();
+  const today = new Date().toISOString().slice(0,10);
+  app.innerHTML = `
+  ${dataUnitCardHtml(md, today)}
+  ${prosesServiceCardHtml()}
+
+  <div class="card accordion" data-open="false">
+    <div class="accordion-head" onclick="toggleAccordion(this)"><h3>Saran Perbaikan</h3><span class="accordion-chevron">&#9662;</span></div>
+    <div class="accordion-body">
+
+    <h4>Nama Jasa</h4>
+    <div style="overflow-x:auto;">
+      <table class="items-table">
+        <thead>
+          <tr><th>Nama Jasa</th><th>Waktu</th><th>Harga Satuan</th><th>Keterangan</th><th></th></tr>
+        </thead>
+        <tbody id="jasaWrap"></tbody>
+      </table>
+    </div>
+    <p class="note">Total Estimasi Biaya Jasa: <b id="totalJasa">Rp 0</b></p>
+    <button class="secondary" onclick="addJasaRow()">+ Tambah Jasa</button>
+
+    <h4 style="margin-top:22px;">Nama Parts <span class="note">(hanya isi jika part TIDAK tersedia di gudang)</span></h4>
+    <div style="overflow-x:auto;">
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th>Nama Parts</th>
+            <th>Qty</th>
+            <th>Harga Satuan</th>
+            <th>Keterangan</th>
+            <th>Ketersediaan</th>
+            <th>Foto</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="itemsWrap"></tbody>
+      </table>
+    </div>
+    <p class="note">Total Estimasi Biaya Parts: <b id="totalParts">Rp 0</b></p>
+    <button class="secondary" onclick="addItemBlock()">+ Tambah Komponen</button>
+    </div>
+  </div>
+
+  ${hybridHealthCheckCardHtml()}
+
+  <div class="card accordion" data-open="false">
+    <div class="accordion-head" onclick="toggleAccordion(this)"><h3>Special Service Campaign</h3><span class="accordion-chevron">&#9662;</span></div>
+    <div class="accordion-body">
+    <div class="row">
+      <div><label>Apakah Unit Ini Terlibat SSC ?</label>
+        <select id="sscTerlibat" onchange="toggleSSC()">
+          <option value="Tidak Terlibat">Tidak Terlibat</option>
+          <option value="Terlibat">Terlibat</option>
+        </select>
+        <p class="note">Cek di <a href="https://ssc.toyota.astra.co.id/" target="_blank" rel="noopener">ssc.toyota.astra.co.id</a></p>
+      </div>
+    </div>
+    <div id="ssc-block" style="display:none">
+      <p class="note">*muncul jika memilih Terlibat</p>
+      <div style="overflow-x:auto;">
+        <table class="items-table">
+          <thead><tr><th>SSC</th><th>Status</th><th>Alasan</th><th></th></tr></thead>
+          <tbody id="sscWrap"></tbody>
+        </table>
+      </div>
+      <button class="secondary" onclick="addSSCRow()">+ Tambah SSC</button>
+    </div>
+    </div>
+  </div>
+
+  ${ujiEmisiCardHtml()}
+
+  <button class="primary" onclick="submitKunjungan()">Simpan &amp; Kirim ke Foreman</button>
+  `;
+  addJasaRow();
+  addItemBlock();
+  if(currentTeknisi) setSelectValuePreserving(document.getElementById('teknisi'), currentTeknisi);
+}
+function toggleSSC(){
+  const isYes = document.getElementById('sscTerlibat').value === 'Terlibat';
+  document.getElementById('ssc-block').style.display = isYes ? '' : 'none';
+  // #sscWrap cuma ada di form create Teknisi - di form edit Foreman (#foremanSSCWrap)
+  // baris sudah diisi eksplisit dari data yang ada, jadi tidak perlu auto-tambah baris.
+  const wrap = document.getElementById('sscWrap');
+  if(isYes && wrap && !wrap.querySelector('tr')) addSSCRow();
+}
+function addSSCRow(){
+  const md = masterData || {};
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><select class="ssc-name">${optionList(md.SSC)}</select></td>
+    <td><select class="ssc-status"><option value="Sudah Dikerjakan">Sudah Dikerjakan</option><option value="Belum Dikerjakan">Belum Dikerjakan</option></select></td>
+    <td>
+      <select class="ssc-alasan" onchange="toggleOther(this)">${optionListWithOther(md.Alasan_SSC)}</select>
+      <input class="ssc-alasan-other" style="display:none" placeholder="Sebutkan alasan lain">
+    </td>
+    <td><button type="button" class="row-remove" onclick="this.closest('tr').remove()" title="Hapus baris">&times;</button></td>
+  `;
+  document.getElementById('sscWrap').appendChild(tr);
+}
+let jasaCount = 0;
+function addJasaRow(){
+  jasaCount++;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input class="j-nama"></td>
+    <td><input class="j-waktu" placeholder="cth: 30 menit"></td>
+    <td><input class="j-harga" type="text" inputmode="numeric" oninput="formatRibuan(this); updateTotalJasa()"></td>
+    <td><input class="j-ket"></td>
+    <td><button type="button" class="row-remove" onclick="this.closest('tr').remove(); updateTotalJasa()" title="Hapus baris">&times;</button></td>
+  `;
+  document.getElementById('jasaWrap').appendChild(tr);
+}
+function updateTotalJasa(){
+  const rows = [...document.querySelectorAll('#jasaWrap tr')];
+  let total = 0;
+  rows.forEach(r => { total += parseRibuan(r.querySelector('.j-harga').value); });
+  document.getElementById('totalJasa').textContent = 'Rp ' + total.toLocaleString('id-ID');
+}
+function addItemBlock(){
+  itemCount++;
+  const id = 'item'+itemCount;
+  const wrap = document.getElementById('itemsWrap');
+  const tr = document.createElement('tr');
+  tr.id=id;
+  tr.innerHTML = `
+    <td><input class="f-nama"></td>
+    <td><input class="f-qty" type="number" min="1" value="1" oninput="updateTotalParts()"></td>
+    <td><input class="f-harga" type="text" inputmode="numeric" oninput="formatRibuan(this); updateTotalParts()"></td>
+    <td><input class="f-ket" placeholder="cth: aus, bocor, patah dudukan..."></td>
+    <td><select class="f-ketersediaan">
+          <option value="">-- Pilih --</option>
+          <option value="Ready">Ready</option>
+          <option value="Indent">Indent</option>
+          <option value="Tidak Tersedia (perlu order)">Tidak Tersedia (perlu order)</option>
+        </select></td>
+    <td><input class="f-foto" type="file" accept="image/*"></td>
+    <td><button type="button" class="row-remove" onclick="this.closest('tr').remove(); updateTotalParts()" title="Hapus baris">&times;</button></td>
+  `;
+  document.getElementById('itemsWrap').appendChild(tr);
+}
+function updateTotalParts(){
+  const rows = [...document.querySelectorAll('#itemsWrap tr')];
+  let total = 0;
+  rows.forEach(r => {
+    const qty = Number(r.querySelector('.f-qty').value) || 0;
+    const harga = parseRibuan(r.querySelector('.f-harga').value);
+    total += qty * harga;
+  });
+  document.getElementById('totalParts').textContent = 'Rp ' + total.toLocaleString('id-ID');
+}
+function fileToBase64(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=> resolve(reader.result.split(',')[1]);
+    reader.onerror = ()=> reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+async function submitKunjungan(){
+  const blocks = [...document.querySelectorAll('#itemsWrap tr')];
+  const btn = document.querySelector('main button.primary');
+  if(btn){ btn.disabled = true; btn.textContent = 'Menyimpan...'; }
+  try{
+    const items = [];
+    for(const b of blocks){
+      const namaKomponen = b.querySelector('.f-nama').value;
+      const qty = b.querySelector('.f-qty').value;
+      if(!namaKomponen || !qty) continue;
+      const item = { namaKomponen, qty, hargaSatuan: parseRibuan(b.querySelector('.f-harga').value), keterangan: b.querySelector('.f-ket').value, ketersediaanPart: b.querySelector('.f-ketersediaan').value };
+      const file = b.querySelector('.f-foto').files[0];
+      if(file){
+        if(btn) btn.textContent = 'Mengupload foto...';
+        const base64Data = await fileToBase64(file);
+        const uploadRes = await api('uploadFoto','POST',{ base64Data, mimeType: file.type, fileName: file.name });
+        if(uploadRes && uploadRes.url) item.fotoUrl = uploadRes.url;
+        else if(uploadRes && uploadRes.error) alert('Gagal upload foto "'+file.name+'": '+uploadRes.error);
+        if(btn) btn.textContent = 'Menyimpan...';
+      }
+      items.push(item);
+    }
+
+    const itemsJasa = [];
+    for(const b of document.querySelectorAll('#jasaWrap tr')){
+      const namaJasa = b.querySelector('.j-nama').value;
+      if(!namaJasa) continue;
+      itemsJasa.push({
+        namaJasa,
+        waktu: b.querySelector('.j-waktu').value,
+        hargaSatuan: parseRibuan(b.querySelector('.j-harga').value),
+        keterangan: b.querySelector('.j-ket').value
+      });
+    }
+
+    const itemsSSC = [];
+    for(const b of document.querySelectorAll('#sscWrap tr')){
+      const ssc = b.querySelector('.ssc-name').value;
+      if(!ssc) continue;
+      itemsSSC.push({
+        ssc,
+        status: b.querySelector('.ssc-status').value,
+        alasan: readDropdownWithOther(b.querySelector('.ssc-alasan'))
+      });
+    }
+
+    const ujiEmisi = { status: document.getElementById('ujiEmisiStatus').value };
+    const ujiEmisiFile = document.getElementById('ujiEmisiFoto').files[0];
+    if(ujiEmisiFile){
+      if(btn) btn.textContent = 'Mengupload foto uji emisi...';
+      const base64Data = await fileToBase64(ujiEmisiFile);
+      const uploadRes = await api('uploadFoto','POST',{ base64Data, mimeType: ujiEmisiFile.type, fileName: ujiEmisiFile.name });
+      if(uploadRes && uploadRes.url) ujiEmisi.fotoUrl = uploadRes.url;
+      else if(uploadRes && uploadRes.error) alert('Gagal upload foto uji emisi: '+uploadRes.error);
+      if(btn) btn.textContent = 'Menyimpan...';
+    }
+
+    const tipeMobil = document.getElementById('tipeMobil').value;
+    const tipeService = document.getElementById('tipeService').value;
+    const tanggalService = document.getElementById('tanggalService').value;
+    const sa = document.getElementById('sa').value;
+    const teknisi = document.getElementById('teknisi').value;
+    if(!document.getElementById('noPolisi').value || !tipeMobil || !tipeService || !tanggalService || !sa || !teknisi){
+      alert('No. Polisi, Tipe Mobil, Tipe Service, Tanggal Service, Service Advisor, dan Teknisi wajib diisi'); return;
+    }
+    const proses = {
+      pekerjaan: document.getElementById('pekerjaan').value,
+      requestCustomer: document.getElementById('requestCustomer').value,
+      aki: readChecklist('aki'),
+      ban: { ...readChecklist('ban'),
+        merk1: document.getElementById('ban-merk1').value, harga1: parseRibuan(document.getElementById('ban-harga1').value),
+        merk2: document.getElementById('ban-merk2').value, harga2: parseRibuan(document.getElementById('ban-harga2').value) },
+      kampasRem: readChecklist('kampasRem'),
+      wiper: readChecklist('wiper'),
+      lampu: readChecklist('lampu')
+    };
+    const hybridHealthCheck = {
+      mobilHybrid: document.getElementById('mobilHybrid').value,
+      sbe50k100k: document.getElementById('sbe50k100k').value,
+      mobil2to5Tahun: document.getElementById('mobil2to5Tahun').value,
+      hhc: document.getElementById('hhcStatus').value,
+      hasil: document.getElementById('hhcHasil').value
+    };
+    const body = {
+      noPolisi: document.getElementById('noPolisi').value.toUpperCase().split(' ').join(''),
+      namaCustomer: document.getElementById('namaCustomer').value,
+      noHp: document.getElementById('noHp').value,
+      tipeMobil, tipeService,
+      tanggalMasuk: tanggalService,
+      sa, teknisi,
+      proses,
+      items,
+      itemsJasa,
+      hybridHealthCheck,
+      sscTerlibat: document.getElementById('sscTerlibat').value,
+      itemsSSC,
+      ujiEmisi
+    };
+    const res = await api('createKunjungan','POST',body);
+    if(res.demo){
+      alert('Demo: data akan tersimpan setelah API terhubung.');
+    } else if(res.success){
+      document.getElementById('app').innerHTML = teknisiSuccessHtml(res.idKunjungan, body.noPolisi);
+      return;
+    } else {
+      alert('Gagal menyimpan: ' + (res.error || 'unknown error'));
+    }
+  } finally {
+    if(btn){ btn.disabled = false; btn.textContent = 'Simpan & Kirim ke Foreman'; }
+  }
+}
+function teknisiSuccessHtml(idKunjungan, noPolisi){
+  return `
+  <div class="card">
+    <h3>Tersimpan ✓</h3>
+    <p>Data untuk <b>${escapeHtml(noPolisi)}</b> (ID: ${idKunjungan}) berhasil disimpan dan masuk antrian Foreman.</p>
+    <button class="primary" onclick="printTeknisiReport('${idKunjungan}', this)">Cetak Laporan (Draft)</button>
+    <button class="secondary" onclick="render('input')">+ Input Saran Baru Lain</button>
+  </div>`;
+}
+async function printTeknisiReport(idKunjungan, btn){
+  if(btn){ btn.disabled = true; btn.textContent = 'Menyiapkan PDF...'; }
+  try{
+    const res = await api('generateReport','POST',{ idKunjungan, printedBy: 'teknisi' });
+    if(res && res.pdfUrl) window.open(res.pdfUrl, '_blank');
+    else alert('Gagal membuat PDF: ' + (res && res.error ? res.error : 'unknown error'));
+  } finally {
+    if(btn){ btn.disabled = false; btn.textContent = 'Cetak Laporan (Draft)'; }
+  }
+}
+async function renderRiwayatTeknisi(app){
+  if(!requireTeknisi(app)) return;
+  app.innerHTML = `<div class="card"><h3>Riwayat Saya</h3><div id="riwayatTeknisiTable">Memuat...</div></div>`;
+  const rows = await api('listKunjungan');
+  if(!document.getElementById('riwayatTeknisiTable')) return;
+  if(rows.demo){ document.getElementById('riwayatTeknisiTable').innerHTML = '<p class="note">Demo mode.</p>'; return; }
+  const mine = rows.filter(r=>r.Teknisi===currentTeknisi);
+  dtInit('riwayatTeknisiTable', mine, [
+    { key:'No_Polisi', label:'No. Polisi', filterable:true, filterType:'text' },
+    { key:'Nama_Customer', label:'Customer', filterable:true, filterType:'text' },
+    { key:'Tanggal_Masuk', label:'Tanggal', filterable:false, render:r=>r.Tanggal_Masuk?toDateInputValue(r.Tanggal_Masuk):'-' },
+    { key:'Tipe_Service', label:'Tipe Service', filterable:true, filterType:'select' },
+    { key:'Status', label:'Status', filterable:true, filterType:'select', render:r=>`<span class="badge ${statusBadgeClass(r.Status)}">${escapeHtml(r.Status)}</span>` },
+    { key:'aksi', label:'', sortable:false, filterable:false, render:r=>`<button type="button" class="secondary" onclick="printTeknisiReport('${r.ID_Kunjungan}', this)">Cetak (Draft)</button>` }
+  ], 'Tanggal_Masuk');
+}
+
+/* ---------- FOREMAN: lengkapi & edit antrian ---------- */
+async function renderAntrianForeman(app){
+  app.innerHTML = `
+  <div class="split-panel">
+    <div class="split-queue" id="foremanQueue"><p class="note">Memuat...</p></div>
+    <div class="split-detail" id="foremanEditPanel"><div class="card"><p class="note">Pilih kunjungan dari antrian di sebelah kiri.</p></div></div>
+  </div>`;
+  const rows = await api('listKunjungan');
+  const queue = document.getElementById('foremanQueue');
+  if(!queue) return; // pengguna sudah pindah tab sebelum data selesai dimuat
+  if(rows.demo){ queue.innerHTML='<p class="note">Demo mode - hubungkan API untuk data real.</p>'; return; }
+  // Menerima status lama "Menunggu Partman" juga, supaya kunjungan yang sudah ada sebelum
+  // rename Partman->Foreman tidak hilang dari antrian.
+  const waiting = rows.filter(r=>r.Status==='Menunggu Foreman' || r.Status==='Menunggu Partman');
+  queue.innerHTML = waiting.length ? waiting.map(r=>`
+    <div class="queue-item" data-id="${r.ID_Kunjungan}" onclick="selectForemanQueueItem('${r.ID_Kunjungan}', this)">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px;">
+        <b>${escapeHtml(r.No_Polisi)}</b><span class="badge wait">Menunggu</span>
+      </div>
+      <div class="note">${escapeHtml(r.Nama_Customer)}</div>
+    </div>`).join('') : '<p class="note">Tidak ada antrian.</p>';
+}
+function selectForemanQueueItem(id, el){
+  [...document.querySelectorAll('.queue-item')].forEach(q=>q.classList.remove('active'));
+  el.classList.add('active');
+  openForemanEdit(id);
+}
+async function openForemanEdit(id){
+  currentDetailId = id;
+  const app = document.getElementById('foremanEditPanel') || document.getElementById('app');
+  app.innerHTML = `<div class="card"><p class="note">Memuat data...</p></div>`;
+  const md = await loadMasterData();
+  const detail = await api('getKunjungan','GET',{id});
+  const kj = detail.kunjungan;
+  app.innerHTML = `
+  <h3 style="margin:0 0 4px;">Edit Data Kunjungan - ${id}</h3>
+  ${dataUnitCardHtml(md, '')}
+  ${prosesServiceCardHtml()}
+  <button class="primary" onclick="saveForemanChanges()">Simpan Perubahan</button>
+
+  <div class="card accordion" data-open="false" style="margin-top:16px;">
+    <div class="accordion-head" onclick="toggleAccordion(this)"><h3>Saran Perbaikan</h3><span class="accordion-chevron">&#9662;</span></div>
+    <div class="accordion-body">
+
+    <h4>Nama Jasa</h4>
+    <div style="overflow-x:auto;">
+      <table class="items-table">
+        <thead><tr><th>Nama Jasa</th><th>Waktu</th><th>Harga Satuan</th><th>Keterangan</th><th></th></tr></thead>
+        <tbody id="foremanJasaWrap"></tbody>
+      </table>
+    </div>
+    <button class="secondary" onclick="addForemanJasaRow()">+ Tambah Jasa</button>
+
+    <h4 style="margin-top:22px;">Nama Parts</h4>
+    <div style="overflow-x:auto;">
+      <table class="items-table">
+        <thead><tr>
+          <th>Nama Parts</th><th>Qty</th><th>Harga Satuan</th><th>Keterangan</th>
+          <th>Ketersediaan</th><th>Foto</th><th></th>
+        </tr></thead>
+        <tbody id="foremanPartsWrap"></tbody>
+      </table>
+    </div>
+    <button class="secondary" onclick="addForemanPartRow()">+ Tambah Parts</button>
+    </div>
+  </div>
+
+  ${hybridHealthCheckCardHtml()}
+  <button class="primary" onclick="saveForemanChanges()">Simpan Perubahan</button>
+
+  <div class="card accordion" data-open="false" style="margin-top:16px;">
+    <div class="accordion-head" onclick="toggleAccordion(this)"><h3>Special Service Campaign</h3><span class="accordion-chevron">&#9662;</span></div>
+    <div class="accordion-body">
+    <div class="row">
+      <div><label>Apakah Unit Ini Terlibat SSC ?</label>
+        <select id="sscTerlibat" onchange="toggleSSC()">
+          <option value="Tidak Terlibat">Tidak Terlibat</option>
+          <option value="Terlibat">Terlibat</option>
+        </select>
+        <p class="note">Cek di <a href="https://ssc.toyota.astra.co.id/" target="_blank" rel="noopener">ssc.toyota.astra.co.id</a></p>
+      </div>
+    </div>
+    <div id="ssc-block" style="display:none">
+      <div style="overflow-x:auto;">
+        <table class="items-table">
+          <thead><tr><th>SSC</th><th>Status</th><th>Alasan</th><th></th></tr></thead>
+          <tbody id="foremanSSCWrap"></tbody>
+        </table>
+      </div>
+      <button class="secondary" onclick="addForemanSSCRow()">+ Tambah SSC</button>
+    </div>
+    </div>
+  </div>
+  <button class="primary" onclick="saveForemanChanges()">Simpan Perubahan</button>
+
+  ${ujiEmisiCardHtml()}
+  <button class="primary" onclick="saveForemanChanges()">Simpan Perubahan</button>
+
+  <div class="card" style="margin-top:16px;">
+    <label class="req">Nama Foreman</label>
+    <select id="namaForeman">${optionList(md.Foreman)}</select>
+    <p class="note">Klik tombol di bawah untuk menyimpan seluruh perubahan lalu mengirim report ke Service Advisor.</p>
+    <button class="primary" onclick="finishAndGenerate(this)">Kirim ke SA</button>
+  </div>
+  `;
+  document.getElementById('noPolisi').value = kj.No_Polisi || '';
+  document.getElementById('namaCustomer').value = kj.Nama_Customer || '';
+  document.getElementById('noHp').value = kj.No_HP_Customer || '';
+  setSelectValuePreserving(document.getElementById('tipeMobil'), kj.Tipe_Mobil);
+  setSelectValuePreserving(document.getElementById('tipeService'), kj.Tipe_Service);
+  document.getElementById('tanggalService').value = toDateInputValue(kj.Tanggal_Masuk);
+  setSelectValuePreserving(document.getElementById('sa'), kj.SA);
+  setSelectValuePreserving(document.getElementById('teknisi'), kj.Teknisi);
+  fillProsesServiceFromKunjungan(kj);
+  fillHybridHealthCheckFromKunjungan(kj);
+  fillUjiEmisiFromKunjungan(kj);
+  // Terjemahkan nilai lama "Yes"/"No" (sebelum opsi diganti jadi Terlibat/Tidak Terlibat)
+  document.getElementById('sscTerlibat').value =
+    kj.SSC_Terlibat === 'Yes' ? 'Terlibat' :
+    kj.SSC_Terlibat === 'No' ? 'Tidak Terlibat' :
+    (kj.SSC_Terlibat || 'Tidak Terlibat');
+  toggleSSC();
+  // Default ke Foreman yang sedang login (belum pernah difinalisasi Foreman lain
+  // sebelumnya) - kalau sudah pernah, pertahankan nama yang tercatat.
+  setSelectValuePreserving(document.getElementById('namaForeman'), kj.Nama_Foreman || currentForeman);
+
+  (detail.itemsJasa||[]).forEach(it=>addForemanJasaRow(it));
+  (detail.items||[]).forEach(it=>addForemanPartRow(it));
+  (detail.itemsSSC||[]).forEach(it=>addForemanSSCRow(it));
+}
+function addForemanJasaRow(it){
+  it = it || {};
+  const tr = document.createElement('tr');
+  tr.dataset.id = it.ID_Jasa || '';
+  tr.innerHTML = `
+    <td><input class="fj-nama" value="${escapeHtml(it.Nama_Jasa||'')}"></td>
+    <td><input class="fj-waktu" value="${escapeHtml(it.Waktu||'')}"></td>
+    <td><input class="fj-harga" type="text" inputmode="numeric" oninput="formatRibuan(this)" value="${toRibuan(it.Harga_Satuan)}"></td>
+    <td><input class="fj-ket" value="${escapeHtml(it.Keterangan||'')}"></td>
+    <td>
+      <button type="button" class="secondary" onclick="saveForemanJasaRow(this)">Simpan</button>
+      <button type="button" class="row-remove" onclick="deleteForemanJasaRow(this)" title="Hapus">&times;</button>
+    </td>
+  `;
+  document.getElementById('foremanJasaWrap').appendChild(tr);
+}
+async function saveForemanJasaRow(btn){
+  const tr = btn.closest('tr');
+  const id = tr.dataset.id;
+  const namaJasa = tr.querySelector('.fj-nama').value;
+  const waktu = tr.querySelector('.fj-waktu').value;
+  const hargaSatuan = parseRibuan(tr.querySelector('.fj-harga').value);
+  const keterangan = tr.querySelector('.fj-ket').value;
+  let res;
+  if(!id){
+    res = await api('addItemJasa','POST',{ idKunjungan: currentDetailId, namaJasa, waktu, hargaSatuan, keterangan });
+    if(res.success) tr.dataset.id = res.idJasa;
+  } else {
+    res = await api('updateRow','POST',{ sheet:'Item_Jasa', id, fields:{
+      Nama_Jasa: namaJasa, Waktu: waktu, Harga_Satuan: hargaSatuan, Keterangan: keterangan
+    }});
+  }
+  btn.textContent = res.success ? 'Tersimpan ✓' : 'Gagal';
+}
+async function deleteForemanJasaRow(btn){
+  const tr = btn.closest('tr');
+  const id = tr.dataset.id;
+  if(id){
+    if(!confirm('Hapus baris jasa ini?')) return;
+    await api('deleteRow','POST',{ sheet:'Item_Jasa', id });
+  }
+  tr.remove();
+}
+function addForemanPartRow(it){
+  it = it || {};
+  const tr = document.createElement('tr');
+  tr.dataset.id = it.ID_Item || '';
+  tr.innerHTML = `
+    <td><input class="fp-nama" value="${escapeHtml(it.Nama_Komponen||'')}"></td>
+    <td><input class="fp-qty" type="number" min="1" value="${it.Qty||1}"></td>
+    <td><input class="fp-hargasatuan" type="text" inputmode="numeric" oninput="formatRibuan(this)" value="${toRibuan(it.Harga_Satuan_Teknisi)}"></td>
+    <td><input class="fp-ket-teknisi" value="${escapeHtml(it.Keterangan_Teknisi||'')}"></td>
+    <td><select class="fp-ketersediaan">
+          <option value="">-- Pilih --</option>
+          <option value="Ready" ${it.Ketersediaan_Part==='Ready'?'selected':''}>Ready</option>
+          <option value="Indent" ${it.Ketersediaan_Part==='Indent'?'selected':''}>Indent</option>
+          <option value="Tidak Tersedia (perlu order)" ${it.Ketersediaan_Part==='Tidak Tersedia (perlu order)'?'selected':''}>Tidak Tersedia (perlu order)</option>
+        </select></td>
+    <td>
+      <input class="fp-foto" type="file" accept="image/*">
+      ${it.Foto_URL ? `<div class="note"><a href="${it.Foto_URL}" target="_blank">lihat foto</a></div>` : ''}
+    </td>
+    <td>
+      <button type="button" class="secondary" onclick="saveForemanPartRow(this)">Simpan</button>
+      <button type="button" class="row-remove" onclick="deleteForemanPartRow(this)" title="Hapus">&times;</button>
+    </td>
+  `;
+  document.getElementById('foremanPartsWrap').appendChild(tr);
+}
+async function saveForemanPartRow(btn){
+  const tr = btn.closest('tr');
+  const id = tr.dataset.id;
+  const namaKomponen = tr.querySelector('.fp-nama').value;
+  const qty = tr.querySelector('.fp-qty').value;
+  const hargaSatuan = parseRibuan(tr.querySelector('.fp-hargasatuan').value);
+  const keterangan = tr.querySelector('.fp-ket-teknisi').value;
+  const ketersediaanPart = tr.querySelector('.fp-ketersediaan').value;
+  let fotoUrl;
+  const file = tr.querySelector('.fp-foto').files[0];
+  if(file){
+    btn.textContent = 'Mengupload foto...';
+    const base64Data = await fileToBase64(file);
+    const uploadRes = await api('uploadFoto','POST',{ base64Data, mimeType: file.type, fileName: file.name });
+    if(uploadRes && uploadRes.url) fotoUrl = uploadRes.url;
+    else if(uploadRes && uploadRes.error) alert('Gagal upload foto: '+uploadRes.error);
+  }
+  let res;
+  if(!id){
+    res = await api('addItemSaran','POST',{ idKunjungan: currentDetailId, namaKomponen, qty, hargaSatuan, keterangan, ketersediaanPart, fotoUrl });
+    if(res.success) tr.dataset.id = res.idItem;
+  } else {
+    const fields = {
+      Nama_Komponen: namaKomponen, Qty: qty, Harga_Satuan_Teknisi: hargaSatuan, Keterangan_Teknisi: keterangan,
+      Ketersediaan_Part: ketersediaanPart
+    };
+    if(fotoUrl) fields.Foto_URL = fotoUrl;
+    res = await api('updateRow','POST',{ sheet:'Item_Saran', id, fields });
+  }
+  btn.textContent = res.success ? 'Tersimpan ✓' : 'Gagal';
+}
+async function deleteForemanPartRow(btn){
+  const tr = btn.closest('tr');
+  const id = tr.dataset.id;
+  if(id){
+    if(!confirm('Hapus part ini?')) return;
+    await api('deleteRow','POST',{ sheet:'Item_Saran', id });
+  }
+  tr.remove();
+}
+function addForemanSSCRow(it){
+  it = it || {};
+  const md = masterData || {};
+  const tr = document.createElement('tr');
+  tr.dataset.id = it.ID_SSC || '';
+  const alasanIsOther = it.Alasan && !(md.Alasan_SSC||[]).includes(it.Alasan);
+  tr.innerHTML = `
+    <td><select class="fssc-name">${optionList(ensureOptionPresent(md.SSC, it.SSC))}</select></td>
+    <td><select class="fssc-status"><option value="Sudah Dikerjakan">Sudah Dikerjakan</option><option value="Belum Dikerjakan">Belum Dikerjakan</option></select></td>
+    <td>
+      <select class="fssc-alasan" onchange="toggleOther(this)">${optionListWithOther(md.Alasan_SSC)}</select>
+      <input class="fssc-alasan-other" style="display:${alasanIsOther?'':'none'}" placeholder="Sebutkan alasan lain" value="${alasanIsOther?escapeHtml(it.Alasan):''}">
+    </td>
+    <td>
+      <button type="button" class="secondary" onclick="saveForemanSSCRow(this)">Simpan</button>
+      <button type="button" class="row-remove" onclick="deleteForemanSSCRow(this)" title="Hapus">&times;</button>
+    </td>
+  `;
+  document.getElementById('foremanSSCWrap').appendChild(tr);
+  tr.querySelector('.fssc-name').value = it.SSC || '';
+  tr.querySelector('.fssc-status').value = it.Status || 'Belum Dikerjakan';
+  if(alasanIsOther) tr.querySelector('.fssc-alasan').value = 'Others';
+  else tr.querySelector('.fssc-alasan').value = it.Alasan || '';
+}
+async function saveForemanSSCRow(btn){
+  const tr = btn.closest('tr');
+  const id = tr.dataset.id;
+  const ssc = tr.querySelector('.fssc-name').value;
+  const status = tr.querySelector('.fssc-status').value;
+  const alasan = readDropdownWithOther(tr.querySelector('.fssc-alasan'));
+  let res;
+  if(!id){
+    res = await api('addItemSSC','POST',{ idKunjungan: currentDetailId, ssc, status, alasan });
+    if(res.success) tr.dataset.id = res.idSSC;
+  } else {
+    res = await api('updateRow','POST',{ sheet:'Item_SSC', id, fields:{ SSC: ssc, Status: status, Alasan: alasan } });
+  }
+  btn.textContent = res.success ? 'Tersimpan ✓' : 'Gagal';
+}
+async function deleteForemanSSCRow(btn){
+  const tr = btn.closest('tr');
+  const id = tr.dataset.id;
+  if(id){
+    if(!confirm('Hapus baris SSC ini?')) return;
+    await api('deleteRow','POST',{ sheet:'Item_SSC', id });
+  }
+  tr.remove();
+}
+async function collectAndSaveForemanChanges(){
+  const fields = {
+    No_Polisi: document.getElementById('noPolisi').value.toUpperCase().split(' ').join(''),
+    Nama_Customer: document.getElementById('namaCustomer').value,
+    No_HP_Customer: document.getElementById('noHp').value,
+    Tipe_Mobil: document.getElementById('tipeMobil').value,
+    Tipe_Service: document.getElementById('tipeService').value,
+    Tanggal_Masuk: document.getElementById('tanggalService').value,
+    SA: document.getElementById('sa').value,
+    Teknisi: document.getElementById('teknisi').value,
+    Pekerjaan: document.getElementById('pekerjaan').value,
+    Request_Customer: document.getElementById('requestCustomer').value,
+    Aki_Status: document.getElementById('chk-status-aki').value,
+    Aki_Keterangan: document.getElementById('chk-ket-aki').value,
+    Aki_Harga: parseRibuan(document.getElementById('chk-harga-aki').value),
+    Ban_Status: document.getElementById('chk-status-ban').value,
+    Ban_Keterangan: document.getElementById('chk-ket-ban').value,
+    Ban_Merk1: document.getElementById('ban-merk1').value,
+    Ban_Harga1: parseRibuan(document.getElementById('ban-harga1').value),
+    Ban_Merk2: document.getElementById('ban-merk2').value,
+    Ban_Harga2: parseRibuan(document.getElementById('ban-harga2').value),
+    KampasRem_Status: document.getElementById('chk-status-kampasRem').value,
+    KampasRem_Keterangan: document.getElementById('chk-ket-kampasRem').value,
+    KampasRem_Harga: parseRibuan(document.getElementById('chk-harga-kampasRem').value),
+    Wiper_Status: document.getElementById('chk-status-wiper').value,
+    Wiper_Keterangan: document.getElementById('chk-ket-wiper').value,
+    Wiper_Harga: parseRibuan(document.getElementById('chk-harga-wiper').value),
+    Lampu_Status: document.getElementById('chk-status-lampu').value,
+    Lampu_Keterangan: document.getElementById('chk-ket-lampu').value,
+    Lampu_Harga: parseRibuan(document.getElementById('chk-harga-lampu').value),
+    Mobil_Hybrid: document.getElementById('mobilHybrid').value,
+    SBE_50K_100K: document.getElementById('sbe50k100k').value,
+    Mobil_2_5_Tahun: document.getElementById('mobil2to5Tahun').value,
+    HHC: document.getElementById('hhcStatus').value,
+    HHC_Hasil: document.getElementById('hhcHasil').value,
+    SSC_Terlibat: document.getElementById('sscTerlibat').value,
+    UjiEmisi_Status: document.getElementById('ujiEmisiStatus').value
+  };
+  const ujiEmisiFile = document.getElementById('ujiEmisiFoto').files[0];
+  if(ujiEmisiFile){
+    const base64Data = await fileToBase64(ujiEmisiFile);
+    const uploadRes = await api('uploadFoto','POST',{ base64Data, mimeType: ujiEmisiFile.type, fileName: ujiEmisiFile.name });
+    if(uploadRes && uploadRes.url) fields.UjiEmisi_Foto_URL = uploadRes.url;
+    else if(uploadRes && uploadRes.error) alert('Gagal upload foto uji emisi: '+uploadRes.error);
+  }
+  return await api('updateKunjungan','POST',{ idKunjungan: currentDetailId, fields });
+}
+async function saveForemanChanges(){
+  const res = await collectAndSaveForemanChanges();
+  alert(res.success ? 'Perubahan tersimpan' : 'Gagal menyimpan: '+(res.error||'unknown error'));
+}
+async function finishAndGenerate(btn){
+  const namaForeman = document.getElementById('namaForeman').value;
+  if(!namaForeman){ alert('Nama Foreman wajib diisi'); return; }
+  if(btn){ btn.disabled = true; btn.textContent = 'Mengirim...'; }
+  try{
+    const saveRes = await collectAndSaveForemanChanges();
+    if(!saveRes.success && !saveRes.demo){ alert('Gagal menyimpan perubahan: '+(saveRes.error||'unknown error')); return; }
+    const res = await api('generateReport','POST',{idKunjungan: currentDetailId, namaForeman, printedBy: 'foreman'});
+    if(res.demo){
+      alert('Demo: PDF akan dibuat setelah API terhubung.');
+    } else if(res.pdfUrl){
+      window.open(res.pdfUrl, '_blank');
+      alert('Report terkirim ke SA.');
+      if(document.getElementById('foremanQueue')) renderAntrianForeman(document.getElementById('app'));
+    } else {
+      alert('Gagal membuat report: ' + (res.error || 'unknown error'));
+    }
+  } finally {
+    if(btn){ btn.disabled = false; btn.textContent = 'Kirim ke SA'; }
+  }
+}
+async function renderRiwayatForeman(app){
+  if(!requireForeman(app)) return;
+  app.innerHTML = `<div class="card"><h3>Riwayat</h3><div id="riwayatForemanTable">Memuat...</div></div>`;
+  const rows = await api('listKunjungan');
+  if(!document.getElementById('riwayatForemanTable')) return;
+  if(rows.demo){ document.getElementById('riwayatForemanTable').innerHTML = '<p class="note">Demo mode.</p>'; return; }
+  const mine = rows.filter(r=>r.Nama_Foreman===currentForeman);
+  dtInit('riwayatForemanTable', mine, [
+    { key:'No_Polisi', label:'No. Polisi', filterable:true, filterType:'text' },
+    { key:'Nama_Customer', label:'Customer', filterable:true, filterType:'text' },
+    { key:'Tanggal_Masuk', label:'Tanggal', filterable:false, render:r=>r.Tanggal_Masuk?toDateInputValue(r.Tanggal_Masuk):'-' },
+    { key:'SA', label:'SA', filterable:true, filterType:'select' },
+    { key:'Status', label:'Status', filterable:true, filterType:'select', render:r=>`<span class="badge ${statusBadgeClass(r.Status)}">${escapeHtml(r.Status)}</span>` },
+    { key:'aksi', label:'', sortable:false, filterable:false, render:r=>r.PDF_URL?`<a href="${r.PDF_URL}" target="_blank">Buka PDF Report</a>`:'-' }
+  ], 'Tanggal_Masuk');
+}
+
+/* ---------- SA: konfirmasi jadwal, follow up & laporan ---------- */
+async function renderKonfirmasiSA(app){
+  if(!requireSA(app)) return;
+  app.innerHTML = `<div class="card"><h3>Perlu Dikonfirmasi</h3><p class="note">Report yang baru sampai - cek/sesuaikan tanggal rencana follow up (default H+3), lalu konfirmasi supaya masuk ke kantong Follow Up.</p><div id="list">Memuat...</div></div>`;
+  const rows = await api('listKunjungan');
+  const list = document.getElementById('list');
+  if(rows.demo){ list.innerHTML='<p class="note">Demo mode.</p>'; return; }
+  const pending = rows.filter(r=>r.Status==='Report Terkirim' && r.SA===currentSA && r.FollowUp_Dikonfirmasi!=='Ya');
+  list.innerHTML = pending.length ? pending.map(r=>`
+    <div class="item-block">
+      <b>${escapeHtml(r.No_Polisi)}</b> - ${escapeHtml(r.Nama_Customer)}
+      <div class="row">
+        <div><label>Tanggal Rencana Follow Up</label>
+          <input type="date" id="tgl-${r.ID_Kunjungan}" value="${toDateInputValue(r.Tanggal_FollowUp_Rencana)}">
+        </div>
+      </div>
+      <button type="button" class="primary" onclick="confirmFollowUpDate('${r.ID_Kunjungan}')">Konfirmasi</button>
+    </div>`).join('') : '<p class="note">Tidak ada report baru yang perlu dikonfirmasi.</p>';
+}
+async function confirmFollowUpDate(id){
+  const val = document.getElementById('tgl-'+id).value;
+  if(!val){ alert('Tanggal wajib diisi'); return; }
+  const res = await api('updateRow','POST',{ sheet:'Kunjungan', id, fields:{ Tanggal_FollowUp_Rencana: val, FollowUp_Dikonfirmasi: 'Ya' } });
+  if(res.success){ renderKonfirmasiSA(document.getElementById('app')); }
+  else alert('Gagal menyimpan: '+(res.error||'unknown error'));
+}
+function isThisWeek(dateStr){
+  if(!dateStr) return false;
+  const d = new Date(dateStr);
+  if(isNaN(d)) return false;
+  const now = new Date();
+  const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+  const endOfWeek = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + 7);
+  return d >= startOfWeek && d < endOfWeek;
+}
+async function renderFollowUp(app){
+  if(!requireSA(app)) return;
+  app.innerHTML = `<div class="card"><h3>Follow Up Customer</h3><div id="list">Memuat...</div></div>`;
+  const rows = await api('listKunjungan');
+  const list = document.getElementById('list');
+  if(rows.demo){ list.innerHTML='<p class="note">Demo mode.</p>'; return; }
+  const today = new Date(); today.setHours(0,0,0,0);
+  const mine = rows.filter(r=>r.SA===currentSA);
+  const pending = mine.filter(r=>r.Status==='Report Terkirim' && r.FollowUp_Dikonfirmasi==='Ya' && (r.Status_FollowUp||'Belum')==='Belum');
+  const overdue = pending.filter(r=>new Date(r.Tanggal_FollowUp_Rencana) <= today);
+  const upcoming = pending.filter(r=>new Date(r.Tanggal_FollowUp_Rencana) > today);
+  const dealThisWeek = mine.filter(r=>r.Status_FollowUp==='Deal' && isThisWeek(r.Tanggal_FollowUp_Aktual)).length;
+  const rescheduleCount = mine.filter(r=>r.Status_FollowUp==='Reschedule').length;
+
+  const cardHtml = (r, isOverdue) => `
+    <div class="item-block">
+      <b>${escapeHtml(r.No_Polisi)}</b> - ${escapeHtml(r.Nama_Customer)}
+      <span class="badge ${isOverdue?'overdue':'wait'}">${isOverdue?'Lewat Jatuh Tempo':'Belum Jatuh Tempo'}</span>
+      <div class="row">
+        <div><label>Tanggal Rencana Follow Up</label>
+          <input type="date" id="tgl-${r.ID_Kunjungan}" value="${toDateInputValue(r.Tanggal_FollowUp_Rencana)}">
+        </div>
+        <div style="align-self:flex-end;">
+          <button type="button" class="secondary" onclick="saveFollowUpDate('${r.ID_Kunjungan}')">Simpan Tanggal</button>
+        </div>
+      </div>
+      ${isOverdue ? `
+      <div class="row">
+        <div><label>Status Follow Up</label>
+          <select id="fu-${r.ID_Kunjungan}">
+            <option>Deal</option><option>Tidak Deal</option><option>Reschedule</option>
+          </select>
+        </div>
+        <div><label>Catatan</label><input id="note-${r.ID_Kunjungan}"></div>
+      </div>
+      <button type="button" class="primary" onclick="saveFollowUp('${r.ID_Kunjungan}')">Simpan Hasil Follow Up</button>
+      ` : ''}
+    </div>`;
+
+  list.innerHTML = `
+    <div class="kpi" style="margin-bottom:22px;">
+      <div class="box warning"><div class="num">${overdue.length}</div><div class="lbl">Perlu Follow Up</div></div>
+      <div class="box success"><div class="num">${dealThisWeek}</div><div class="lbl">Deal Minggu Ini</div></div>
+      <div class="box info"><div class="num">${rescheduleCount}</div><div class="lbl">Reschedule</div></div>
+    </div>
+    <h4>Sudah Lewat Jatuh Tempo (${overdue.length})</h4>
+    ${overdue.length ? overdue.map(r=>cardHtml(r,true)).join('') : '<p class="note">Tidak ada.</p>'}
+    <h4 style="margin-top:22px;">Belum Jatuh Tempo (${upcoming.length})</h4>
+    ${upcoming.length ? upcoming.map(r=>cardHtml(r,false)).join('') : '<p class="note">Tidak ada.</p>'}
+  `;
+}
+async function saveFollowUpDate(id){
+  const val = document.getElementById('tgl-'+id).value;
+  if(!val){ alert('Tanggal wajib diisi'); return; }
+  const res = await api('updateRow','POST',{ sheet:'Kunjungan', id, fields:{ Tanggal_FollowUp_Rencana: val } });
+  if(res.success){ renderFollowUp(document.getElementById('app')); }
+  else alert('Gagal menyimpan: '+(res.error||'unknown error'));
+}
+async function saveFollowUp(id){
+  const res = await api('updateFollowUp','POST',{
+    idKunjungan:id,
+    statusFollowUp: document.getElementById('fu-'+id).value,
+    catatan: document.getElementById('note-'+id).value
+  });
+  if(res.success){ renderFollowUp(document.getElementById('app')); }
+  else alert('Gagal menyimpan: '+(res.error||'unknown error'));
+}
+async function renderLaporan(app){
+  if(!requireSA(app)) return;
+  app.innerHTML = `<div class="card"><h3>Kunjungan Siap Dikirim ke Customer</h3><div id="laporanTable">Memuat...</div></div>`;
+  const rows = await api('listKunjungan');
+  if(!document.getElementById('laporanTable')) return;
+  if(rows.demo){ document.getElementById('laporanTable').innerHTML = '<p class="note">Demo mode.</p>'; return; }
+  const mine = rows.filter(r=>r.SA===currentSA);
+  dtInit('laporanTable', mine, [
+    { key:'No_Polisi', label:'No. Polisi', filterable:true, filterType:'text' },
+    { key:'Nama_Customer', label:'Customer', filterable:true, filterType:'text' },
+    { key:'Tanggal_Masuk', label:'Tanggal', filterable:false, render:r=>r.Tanggal_Masuk?toDateInputValue(r.Tanggal_Masuk):'-' },
+    { key:'Tipe_Service', label:'Tipe Service', filterable:true, filterType:'select' },
+    { key:'Teknisi', label:'Teknisi', filterable:true, filterType:'select' },
+    { key:'Status', label:'Status', filterable:true, filterType:'select', render:r=>`<span class="badge ${statusBadgeClass(r.Status)}">${escapeHtml(r.Status)}</span>` },
+    { key:'aksi', label:'', sortable:false, filterable:false, render:r=>r.PDF_URL?`<a href="${r.PDF_URL}" target="_blank">Buka PDF Report</a>`:'-' }
+  ], 'Tanggal_Masuk');
+}
+
+/* ---------- KEPALA BENGKEL: dashboard ---------- */
+async function renderDashboard(app){
+  app.innerHTML = `<div id="dash">Memuat...</div>`;
+  const d = await api('dashboard');
+  const dash = document.getElementById('dash');
+  if(d.demo){ dash.innerHTML='<p class="note">Demo mode - hubungkan API untuk data real.</p>'; return; }
+  let html = `<div class="kpi">
+    <div class="box"><div class="num">${d.totalCustomer.hariIni}</div><div class="lbl">Customer Hari Ini</div></div>
+    <div class="box"><div class="num">${d.totalCustomer.mingguIni}</div><div class="lbl">Customer Minggu Ini</div></div>
+    <div class="box"><div class="num">${d.totalCustomer.bulanIni}</div><div class="lbl">Customer Bulan Ini</div></div>
+    <div class="box"><div class="num">${d.totalKunjungan}</div><div class="lbl">Total Kunjungan</div></div>
+  </div>
+  <div class="card"><h3>Rekap per Service Advisor</h3>
+  <table><tr><th>SA</th><th>Saran Hari Ini</th><th>Saran Minggu Ini</th><th>Saran Bulan Ini</th><th>Deal</th><th>Tidak Deal</th></tr>`;
+  Object.entries(d.perSA).forEach(([sa,v])=>{
+    html += `<tr><td>${sa}</td><td>${v.hari}</td><td>${v.minggu}</td><td>${v.bulan}</td><td>${v.deal}</td><td>${v.tidakDeal}</td></tr>`;
+  });
+  html += `</table></div>`;
+  dash.innerHTML = html;
+}
+async function renderSemua(app){
+  app.innerHTML = `<div class="card"><h3>Semua Kunjungan</h3><div id="list">Memuat...</div></div>`;
+  const rows = await api('listKunjungan');
+  const list = document.getElementById('list');
+  if(rows.demo){ list.innerHTML='<p class="note">Demo mode.</p>'; return; }
+  list.innerHTML = `<table><tr><th>No Polisi</th><th>Customer</th><th>SA</th><th>Teknisi</th><th>Status</th></tr>` +
+    rows.map(r=>`<tr><td>${r.No_Polisi}</td><td>${r.Nama_Customer}</td><td>${r.SA}</td><td>${r.Teknisi}</td><td>${r.Status}</td></tr>`).join('') +
+    `</table>`;
+}
+
+updateIdentitySwitches();
+renderTabs();
+</script>
+</body>
+</html>
